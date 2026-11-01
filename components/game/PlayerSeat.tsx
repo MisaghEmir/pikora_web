@@ -32,6 +32,7 @@ type Props = {
   cardDesign?: string;
   avatarUrl?: string;
   avatarImages?: Record<string, string>;
+  cardImages?: Record<string, string>;
   cardBack?: string;
 };
 
@@ -60,37 +61,27 @@ export default function PlayerSeat({
 
   const isMe = position === "me";
   const isTurn = player.id === turn;
-
   const isFinished = gameState === "SHOWDOWN" || gameState === "FINISHED";
-
   const showRealCard = isMe || isFinished || !!winner;
-
   const cardKeys = player.hand || [];
 
-  // Action text
   const actionText = (() => {
     switch (player.lastAction) {
       case "FOLD":
         return "Fold";
-
       case "CHECK":
         return "Check";
-
       case "CALL":
         return player.currentBet ? String(player.currentBet) : "Check";
-
       case "RAISE":
         return String(player.currentBet || 0);
-
       case "ALL_IN":
         return "All In";
-
       default:
         return "";
     }
   })();
 
-  // Timer
   useEffect(() => {
     if (gameState === "WAITING" || !isTurn) {
       setTime(0);
@@ -105,7 +96,6 @@ export default function PlayerSeat({
           clearInterval(interval);
           return 0;
         }
-
         return previous - 1;
       });
     }, 1000);
@@ -113,13 +103,12 @@ export default function PlayerSeat({
     return () => clearInterval(interval);
   }, [turn, gameState, player.id, isTurn]);
 
-  // Avatar
   const avatar =
     avatarUrl || avatarImages[player.id] || "/images/avatars/default.png";
 
   return (
     <div
-      className={`absolute z-20 flex flex-col items-center ${positionClasses[position]}`}
+      className={`absolute z-20 flex scale-125 flex-col items-center ${positionClasses[position]}`}
     >
       {/* Dealer */}
       {player.dealer && (
@@ -140,14 +129,14 @@ export default function PlayerSeat({
           src={avatar}
           alt={name}
           fill
-          sizes="44px"
+          sizes="55px"
           className="object-cover"
         />
 
         {!isTurn && <div className="absolute inset-0 bg-black/60" />}
       </div>
 
-      {/* Name + Chips */}
+      {/* Name + Chips + Cards */}
       <div className="mt-1 flex items-center gap-2">
         <div className="text-center">
           <p
@@ -167,7 +156,6 @@ export default function PlayerSeat({
         <div className="mt-1 flex gap-1">
           {[0, 1].map((index) => {
             const card = cardKeys[index];
-
             const cardKey = card ? `${card.rank}${card.suit}` : "";
 
             const cardSource =
@@ -209,7 +197,7 @@ export default function PlayerSeat({
                   src={cardSource}
                   alt={card ? `${card.rank} of ${card.suit}` : "Poker card"}
                   fill
-                  sizes="40px"
+                  sizes="50px"
                   className="object-fill"
                   onError={() => {
                     console.error("CARD IMAGE LOAD ERROR:", cardSource);
