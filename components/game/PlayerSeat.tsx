@@ -1,9 +1,9 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { getCardImage } from "@/utils/cardImages";
 
 export type Position = "top" | "left" | "right" | "bottomLeft" | "me";
 
@@ -30,10 +30,8 @@ type Props = {
   gameState?: string;
   winner?: any;
   cardDesign?: string;
-
   avatarUrl?: string;
   avatarImages?: Record<string, string>;
-  cardImages?: Record<string, string>;
   cardBack?: string;
 };
 
@@ -53,34 +51,40 @@ export default function PlayerSeat({
   turn,
   gameState,
   winner,
+  cardDesign = "default",
   avatarUrl,
   avatarImages = {},
-  cardImages = {},
-  cardBack = "/images/cards/back.png",
+  cardBack = "/images/cards/card/back.png",
 }: Props) {
   const [time, setTime] = useState(0);
 
   const isMe = position === "me";
   const isTurn = player.id === turn;
-  const isFinished =
-    gameState === "SHOWDOWN" || gameState === "FINISHED";
+
+  const isFinished = gameState === "SHOWDOWN" || gameState === "FINISHED";
 
   const showRealCard = isMe || isFinished || !!winner;
 
   const cardKeys = player.hand || [];
 
+  // Action text
   const actionText = (() => {
     switch (player.lastAction) {
       case "FOLD":
         return "Fold";
+
       case "CHECK":
         return "Check";
+
       case "CALL":
         return player.currentBet ? String(player.currentBet) : "Check";
+
       case "RAISE":
         return String(player.currentBet || 0);
+
       case "ALL_IN":
         return "All In";
+
       default:
         return "";
     }
@@ -101,6 +105,7 @@ export default function PlayerSeat({
           clearInterval(interval);
           return 0;
         }
+
         return previous - 1;
       });
     }, 1000);
@@ -108,10 +113,9 @@ export default function PlayerSeat({
     return () => clearInterval(interval);
   }, [turn, gameState, player.id, isTurn]);
 
+  // Avatar
   const avatar =
-    avatarUrl ||
-    avatarImages[player.id] ||
-    "/images/avatars/default.png";
+    avatarUrl || avatarImages[player.id] || "/images/avatars/default.png";
 
   return (
     <div
@@ -140,9 +144,7 @@ export default function PlayerSeat({
           className="object-cover"
         />
 
-        {!isTurn && (
-          <div className="absolute inset-0 bg-black/60" />
-        )}
+        {!isTurn && <div className="absolute inset-0 bg-black/60" />}
       </div>
 
       {/* Name + Chips */}
@@ -166,21 +168,28 @@ export default function PlayerSeat({
           {[0, 1].map((index) => {
             const card = cardKeys[index];
 
-            const cardKey = card
-              ? `${card.rank}${card.suit}`
-              : "";
+            const cardKey = card ? `${card.rank}${card.suit}` : "";
 
             const cardSource =
               showRealCard && card
-                ? cardImages[cardKey] || cardBack
-                : cardBack;
+                ? getCardImage(cardDesign, card.rank, card.suit)
+                : "/images/cards/card/back.png";
+
+            console.log({
+              showRealCard,
+              card,
+              cardSource,
+            });
 
             return (
               <motion.div
                 key={`${player.id}-${index}-${cardKey}`}
                 initial={
                   !isMe && showRealCard
-                    ? { scale: 0.8, rotateY: 90 }
+                    ? {
+                        scale: 0.8,
+                        rotateY: 90,
+                      }
                     : false
                 }
                 animate={{
@@ -193,17 +202,18 @@ export default function PlayerSeat({
                   stiffness: 180,
                 }}
                 className={`relative overflow-hidden rounded-[4px] border border-white/20 bg-white shadow-md ${
-                  isMe || showRealCard
-                    ? "h-[60px] w-10"
-                    : "h-7 w-[18px]"
+                  isMe || showRealCard ? "h-[60px] w-10" : "h-7 w-[18px]"
                 }`}
               >
                 <Image
                   src={cardSource}
-                  alt="Poker card"
+                  alt={card ? `${card.rank} of ${card.suit}` : "Poker card"}
                   fill
                   sizes="40px"
                   className="object-fill"
+                  onError={() => {
+                    console.error("CARD IMAGE LOAD ERROR:", cardSource);
+                  }}
                 />
               </motion.div>
             );
@@ -217,9 +227,10 @@ export default function PlayerSeat({
           className="h-full rounded-full bg-[#4CAF50]"
           initial={{ width: "100%" }}
           animate={{
-            width: isTurn && gameState !== "WAITING"
-              ? `${(time / 10) * 100}%`
-              : "0%",
+            width:
+              isTurn && gameState !== "WAITING"
+                ? `${(time / 10) * 100}%`
+                : "0%",
           }}
           transition={{ duration: 0.2 }}
         />
@@ -231,9 +242,18 @@ export default function PlayerSeat({
           {actionText && (
             <motion.div
               key={actionText}
-              initial={{ scaleX: 0, opacity: 0 }}
-              animate={{ scaleX: 1, opacity: 1 }}
-              exit={{ scaleX: 0, opacity: 0 }}
+              initial={{
+                scaleX: 0,
+                opacity: 0,
+              }}
+              animate={{
+                scaleX: 1,
+                opacity: 1,
+              }}
+              exit={{
+                scaleX: 0,
+                opacity: 0,
+              }}
               transition={{ duration: 0.3 }}
               className="flex h-5 items-center rounded-full bg-[#ad4e17] text-white shadow-md"
             >
@@ -247,9 +267,7 @@ export default function PlayerSeat({
                 />
               </span>
 
-              <span className="px-2 text-xs font-semibold">
-                {actionText}
-              </span>
+              <span className="px-2 text-xs font-semibold">{actionText}</span>
             </motion.div>
           )}
         </AnimatePresence>
