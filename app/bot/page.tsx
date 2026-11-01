@@ -58,7 +58,7 @@ type Guest = {
 const positions = ["bottomLeft", "left", "top", "right", "me"] as const;
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+  process.env.NEXT_PUBLIC_SOCKET_URL || "https://poker-server-2-iv79.onrender.com";
 
 const CARD_BACK = "/images/cards/back.png";
 
