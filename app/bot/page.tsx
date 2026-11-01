@@ -1,7 +1,14 @@
 
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { io, type Socket } from "socket.io-client";
 import {
@@ -85,7 +92,11 @@ function formatNumber(value: number) {
   return Number(value || 0).toLocaleString("en-US");
 }
 
-export default function BotPage() {
+// ==================================================
+// BOT PAGE CONTENT
+// ==================================================
+
+function BotPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -582,7 +593,6 @@ export default function BotPage() {
       <div className="absolute inset-0 bg-black/25" />
 
       {/* BACK BUTTON */}
-
       <button
         onClick={leaveGame}
         className="absolute left-5 top-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/50 backdrop-blur-md transition hover:bg-black/80"
@@ -591,7 +601,6 @@ export default function BotPage() {
       </button>
 
       {/* CONNECTION STATUS */}
-
       <div className="absolute right-5 top-5 z-50 flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-4 py-2 text-xs backdrop-blur-md">
         <span
           className={`h-2 w-2 rounded-full ${
@@ -602,17 +611,14 @@ export default function BotPage() {
       </div>
 
       {/* TABLE AREA */}
-
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-20">
         <div className="relative flex h-[min(78vh,760px)] w-full max-w-[1250px] items-center justify-center">
           {/* POKER TABLE */}
-
           <div className="absolute inset-x-[8%] inset-y-[15%]">
             <PokerTable />
           </div>
 
           {/* PLAYERS */}
-
           {players.map((player, index) => {
             if (index >= positions.length) return null;
 
@@ -640,7 +646,6 @@ export default function BotPage() {
           })}
 
           {/* POT */}
-
           <div className="absolute left-1/2 top-[37%] z-20 -translate-x-1/2 -translate-y-1/2">
             <div className="flex min-w-[125px] flex-col items-center rounded-2xl border border-amber-300/20 bg-black/65 px-5 py-2 shadow-xl backdrop-blur-md">
               <span className="text-[10px] font-bold tracking-[0.25em] text-amber-300/70">
@@ -658,7 +663,6 @@ export default function BotPage() {
           </div>
 
           {/* COMMUNITY CARDS */}
-
           <div className="absolute left-1/2 top-[49%] z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-2 sm:gap-3">
             {communityCards.map((card, index) => (
               <div
@@ -679,7 +683,6 @@ export default function BotPage() {
           </div>
 
           {/* EMPTY COMMUNITY CARD SLOTS */}
-
           {communityCards.length === 0 && (
             <div className="absolute left-1/2 top-[49%] z-10 flex -translate-x-1/2 -translate-y-1/2 gap-2 opacity-20">
               {Array.from({ length: 5 }).map((_, index) => (
@@ -692,7 +695,6 @@ export default function BotPage() {
           )}
 
           {/* ERROR */}
-
           {error && (
             <div className="absolute bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-950/90 px-5 py-3 text-sm text-red-200 shadow-xl">
               {error}
@@ -702,7 +704,6 @@ export default function BotPage() {
       </div>
 
       {/* ACTION BAR */}
-
       <div className="absolute bottom-0 left-0 right-0 z-40">
         <ActionBar
           disabled={!myTurn || !connected}
@@ -717,7 +718,6 @@ export default function BotPage() {
       </div>
 
       {/* TABLE CHIPS */}
-
       <button
         onClick={() => {
           setBuyInAmount(minBuyIn);
@@ -730,7 +730,6 @@ export default function BotPage() {
       </button>
 
       {/* RAISE MODAL */}
-
       {showRaise && myPlayer && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#111713] p-6 shadow-2xl">
@@ -782,7 +781,6 @@ export default function BotPage() {
       )}
 
       {/* BUY CHIPS MODAL */}
-
       {showBuyIn && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#111713] p-6 shadow-2xl">
@@ -798,7 +796,9 @@ export default function BotPage() {
             </div>
 
             <div className="mb-5 rounded-xl bg-white/5 p-4">
-              <p className="text-xs text-white/40">Current table chips</p>
+              <p className="text-xs text-white/40">
+                Current table chips
+              </p>
 
               <p className="mt-1 text-xl font-bold">
                 {formatNumber(myPlayer?.chips || 0)}
@@ -837,7 +837,6 @@ export default function BotPage() {
       )}
 
       {/* WINNER BANNER */}
-
       {winner && (
         <div className="pointer-events-none fixed left-1/2 top-24 z-[60] -translate-x-1/2">
           <div className="rounded-2xl border border-amber-300/30 bg-black/85 px-8 py-4 text-center shadow-2xl backdrop-blur-md">
@@ -858,5 +857,23 @@ export default function BotPage() {
         </div>
       )}
     </main>
+  );
+}
+
+// ==================================================
+// PAGE WITH SUSPENSE
+// ==================================================
+
+export default function BotPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#080b09] text-white">
+          <Loader2 className="h-10 w-10 animate-spin text-amber-400" />
+        </main>
+      }
+    >
+      <BotPageContent />
+    </Suspense>
   );
 }
