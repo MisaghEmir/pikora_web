@@ -24,8 +24,8 @@ export default function AboutPage() {
 
           <p className="max-w-2xl mx-auto mt-6 text-white/55 text-lg leading-8">
             PIKORA is a place where players can enjoy poker, improve their
-            skills, and experience the excitement of the game in a simple
-            and welcoming environment.
+            skills, and experience the excitement of the game in a simple and
+            welcoming environment.
           </p>
 
           <Link
@@ -49,28 +49,26 @@ export default function AboutPage() {
             </h2>
 
             <p className="text-white/55 leading-8 mt-6">
-              We created PIKORA with one goal: to make poker accessible
-              and enjoyable for everyone. Whether you are learning the
-              basics or already understand the game, PIKORA gives you a
-              place to practice and have fun.
+              We created PIKORA with one goal: to make poker accessible and
+              enjoyable for everyone. Whether you are learning the basics or
+              already understand the game, PIKORA gives you a place to practice
+              and have fun.
             </p>
 
             <p className="text-white/55 leading-8 mt-4">
-              Our platform focuses on a smooth experience, easy-to-use
-              gameplay, and opportunities to play at your own pace.
+              Our platform focuses on a smooth experience, easy-to-use gameplay,
+              and opportunities to play at your own pace.
             </p>
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-[#1A1D24] p-8 md:p-10">
             <div className="text-5xl font-black text-[#E6B72B]">P</div>
 
-            <h3 className="text-2xl font-bold mt-5">
-              Play. Learn. Improve.
-            </h3>
+            <h3 className="text-2xl font-bold mt-5">Play. Learn. Improve.</h3>
 
             <p className="text-white/50 leading-7 mt-4">
-              Discover poker, practice your decisions, and enjoy every
-              hand with PIKORA.
+              Discover poker, practice your decisions, and enjoy every hand with
+              PIKORA.
             </p>
           </div>
         </div>
@@ -106,9 +104,7 @@ export default function AboutPage() {
               >
                 <div className="w-10 h-1 rounded-full bg-[#E6B72B]" />
 
-                <h3 className="text-xl font-bold mt-6">
-                  {item.title}
-                </h3>
+                <h3 className="text-xl font-bold mt-6">{item.title}</h3>
 
                 <p className="text-white/50 leading-7 mt-3">
                   {item.description}
@@ -120,9 +116,7 @@ export default function AboutPage() {
       </section>
 
       <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <h2 className="text-3xl font-extrabold">
-          Ready to play?
-        </h2>
+        <h2 className="text-3xl font-extrabold">Ready to play?</h2>
 
         <p className="text-white/50 mt-4">
           Start a game and discover the world of PIKORA.
@@ -137,7 +131,7 @@ export default function AboutPage() {
       </section>
 
       <footer className="border-t border-white/5 py-7 text-center text-white/30 text-sm">
-        © {new Date().getFullYear()} PIKORA. All rights reserved.
+        © 2026 PIKORA. All rights reserved.
       </footer>
     </main>
   );

@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { Gift, UserRound, Settings, LogOut, BookOpen, Info } from "lucide-react";
+import {
+  Gift,
+  UserRound,
+  Settings,
+  LogOut,
+  BookOpen,
+  Info,
+} from "lucide-react";
 import { avatarImages } from "@/utils/assets";
 
 interface HomeFooterProps {
@@ -19,7 +26,6 @@ export default function HomeFooter({
   return (
     <footer className="relative z-10 border-t border-white/[0.07] bg-black/30 backdrop-blur-xl">
       <div className="mx-auto flex min-h-[85px] w-full max-w-[1500px] items-center justify-between gap-3 px-5 md:px-10">
-
         {/* User Profile */}
         <Link
           href={user ? "/profile" : "/login"}
