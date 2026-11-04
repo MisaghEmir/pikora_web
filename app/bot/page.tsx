@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -111,9 +110,7 @@ function BotPageContent() {
   const leavingRef = useRef(false);
   const mountedRef = useRef(false);
 
-  const connectionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const connectionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ORIENTATION
   const [isLandscape, setIsLandscape] = useState(false);
@@ -156,14 +153,11 @@ function BotPageContent() {
     (player) => String(player.id) === String(guest?.guestId),
   );
 
-  const myTurn =
-    !!guest && String(gameData.turn) === String(guest.guestId);
+  const myTurn = !!guest && String(gameData.turn) === String(guest.guestId);
 
   const communityCards: Card[] = gameData.communityCards || [];
 
-  const selectedTable = tableImages.find(
-    (item) => item.id === tableBackground,
-  );
+  const selectedTable = tableImages.find((item) => item.id === tableBackground);
 
   const backgroundImage =
     selectedTable?.source ||
@@ -181,19 +175,23 @@ function BotPageContent() {
   // AUTOMATIC LANDSCAPE REQUEST
   // --------------------------------------------------
 
-const handleLandscape = useCallback(async () => {
-  try {
-    if (screen.orientation?.lock) {
-      await screen.orientation.lock("landscape");
-    }
-  } catch (error) {
-    console.log("Landscape lock is not supported:", error);
-  }
+  const handleLandscape = useCallback(async () => {
+    try {
+      const orientation = screen.orientation as unknown as {
+        lock?: (orientation: "landscape") => Promise<void>;
+      };
 
-  setTimeout(() => {
-    setIsLandscape(window.innerWidth > window.innerHeight);
-  }, 300);
-}, []);
+      if (orientation?.lock) {
+        await orientation.lock("landscape");
+      }
+    } catch (error) {
+      console.log("Landscape lock is not supported:", error);
+    }
+
+    setTimeout(() => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    }, 300);
+  }, []);
 
   useEffect(() => {
     const checkOrientation = () => {
@@ -226,9 +224,7 @@ const handleLandscape = useCallback(async () => {
   // --------------------------------------------------
 
   useEffect(() => {
-    setCardDesign(
-      localStorage.getItem("pikora_card_design") || "default",
-    );
+    setCardDesign(localStorage.getItem("pikora_card_design") || "default");
 
     setTableBackground(
       localStorage.getItem("pikora_table_background") || "default",
@@ -461,11 +457,7 @@ const handleLandscape = useCallback(async () => {
       const currentGuest = guestRef.current;
 
       if (currentSocket) {
-        if (
-          currentSocket.connected &&
-          currentGuest &&
-          !leavingRef.current
-        ) {
+        if (currentSocket.connected && currentGuest && !leavingRef.current) {
           currentSocket.emit("leave-game-bot-web", {
             roomId: currentGuest.roomId,
             guestId: currentGuest.guestId,
@@ -625,9 +617,7 @@ const handleLandscape = useCallback(async () => {
             PIKORA
           </h1>
 
-          <h2 className="mt-4 text-lg font-bold">
-            Please Rotate Your Phone
-          </h2>
+          <h2 className="mt-4 text-lg font-bold">Please Rotate Your Phone</h2>
 
           <p className="mt-3 text-sm leading-6 text-white/60">
             Turn your phone horizontally to continue playing poker.
@@ -671,9 +661,7 @@ const handleLandscape = useCallback(async () => {
           </div>
 
           <div className="text-center">
-            <h2 className="text-xl font-bold tracking-widest">
-              PIKORA POKER
-            </h2>
+            <h2 className="text-xl font-bold tracking-widest">PIKORA POKER</h2>
 
             <p className="mt-2 text-sm text-white/60">
               {!connected
@@ -764,9 +752,7 @@ const handleLandscape = useCallback(async () => {
                 name={player.username}
                 chips={player.chips}
                 cardDesign={cardDesign}
-                avatarUrl={
-                  avatarImages[avatarKey] || avatarImages.avatar1
-                }
+                avatarUrl={avatarImages[avatarKey] || avatarImages.avatar1}
                 cardBack={CARD_BACK}
                 winner={winner}
               />
@@ -781,7 +767,10 @@ const handleLandscape = useCallback(async () => {
               </span>
 
               <div className="mt-1 flex items-center gap-1.5 sm:gap-2">
-                <Coins size={14} className="text-amber-400 sm:h-[17px] sm:w-[17px]" />
+                <Coins
+                  size={14}
+                  className="text-amber-400 sm:h-[17px] sm:w-[17px]"
+                />
 
                 <span className="text-base font-black tabular-nums sm:text-xl">
                   {formatNumber(gameData.pot || 0)}
@@ -862,9 +851,7 @@ const handleLandscape = useCallback(async () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/75 p-3 backdrop-blur-sm sm:p-4">
           <div className="my-auto w-full max-w-sm rounded-2xl border border-white/10 bg-[#111713] p-4 shadow-2xl sm:p-6">
             <div className="mb-5 flex items-center justify-between sm:mb-6">
-              <h3 className="text-base font-bold sm:text-lg">
-                Raise Bet
-              </h3>
+              <h3 className="text-base font-bold sm:text-lg">Raise Bet</h3>
 
               <button
                 onClick={() => setShowRaise(false)}
@@ -888,9 +875,7 @@ const handleLandscape = useCallback(async () => {
                 Math.max(raiseAmount, bigBlind),
                 Math.max(bigBlind, myPlayer.chips),
               )}
-              onChange={(event) =>
-                setRaiseAmount(Number(event.target.value))
-              }
+              onChange={(event) => setRaiseAmount(Number(event.target.value))}
               className="w-full accent-amber-400"
             />
 
@@ -928,9 +913,7 @@ const handleLandscape = useCallback(async () => {
             </div>
 
             <div className="mb-4 rounded-xl bg-white/5 p-3 sm:mb-5 sm:p-4">
-              <p className="text-xs text-white/40">
-                Current table chips
-              </p>
+              <p className="text-xs text-white/40">Current table chips</p>
 
               <p className="mt-1 text-lg font-bold sm:text-xl">
                 {formatNumber(myPlayer?.chips || 0)}
@@ -946,15 +929,12 @@ const handleLandscape = useCallback(async () => {
               min={minBuyIn}
               max={maxBuyIn}
               value={buyInAmount}
-              onChange={(event) =>
-                setBuyInAmount(Number(event.target.value))
-              }
+              onChange={(event) => setBuyInAmount(Number(event.target.value))}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-amber-400 sm:text-base"
             />
 
             <p className="mt-2 text-xs text-white/40">
-              Min: {formatNumber(minBuyIn)} · Max:{" "}
-              {formatNumber(maxBuyIn)}
+              Min: {formatNumber(minBuyIn)} · Max: {formatNumber(maxBuyIn)}
             </p>
 
             <button
