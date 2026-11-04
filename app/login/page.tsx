@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
@@ -61,8 +62,27 @@ export default function LoginPage() {
     }
   };
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0F1116] px-5 py-10 text-white">
+
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={handleBack}
+        aria-label="Go back"
+        className="absolute left-5 top-5 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white/80 backdrop-blur-md transition hover:border-[#D6A64F] hover:text-[#D6A64F] active:scale-95"
+      >
+        <ArrowLeft size={21} />
+      </button>
+
       {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center opacity-40"
@@ -75,6 +95,7 @@ export default function LoginPage() {
 
       {/* Content */}
       <div className="relative z-10 flex w-full max-w-6xl flex-col items-center justify-between gap-14 md:flex-row md:gap-10">
+
         {/* Left Side */}
         <section className="flex flex-col items-center text-center md:items-start md:text-left">
           <h1 className="text-5xl font-black tracking-[3px] md:text-6xl">
@@ -92,13 +113,16 @@ export default function LoginPage() {
             className="mt-8 text-sm text-white/50 transition hover:text-white"
           >
             Don&apos;t have an account?{" "}
-            <span className="font-bold text-[#D6A64F]">Create Account</span>
+            <span className="font-bold text-[#D6A64F]">
+              Create Account
+            </span>
           </Link>
         </section>
 
         {/* Login Box */}
         <section className="w-full max-w-[390px] rounded-xl bg-gradient-to-br from-white via-[#B87317] to-white p-[3px] shadow-[0_0_50px_rgba(184,115,23,0.12)]">
           <div className="rounded-[10px] bg-[#1D1C1C] p-7 sm:p-9">
+
             <div className="mb-8">
               <h2 className="text-2xl font-bold">Welcome Back</h2>
               <p className="mt-2 text-sm text-white/40">
@@ -107,6 +131,7 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
+
               {/* Email */}
               <div>
                 <label className="mb-2 block text-sm text-white/65">

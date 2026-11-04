@@ -58,7 +58,8 @@ type Guest = {
 const positions = ["bottomLeft", "left", "top", "right", "me"] as const;
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL || "https://poker-server-2-iv79.onrender.com";
+  process.env.NEXT_PUBLIC_SOCKET_URL ||
+  "https://poker-server-2-iv79.onrender.com";
 
 const CARD_BACK = "/images/cards/back.png";
 
@@ -532,7 +533,7 @@ function BotPageContent() {
   if (loading) {
     return (
       <main
-        className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cover bg-center text-white"
+        className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-cover bg-center px-4 text-white"
         style={{ backgroundImage: `url('${backgroundImage}')` }}
       >
         <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
@@ -587,7 +588,7 @@ function BotPageContent() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-cover bg-center bg-no-repeat text-white"
+      className="relative min-h-[100dvh] overflow-hidden bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url('${backgroundImage}')` }}
     >
       <div className="absolute inset-0 bg-black/25" />
@@ -595,13 +596,13 @@ function BotPageContent() {
       {/* BACK BUTTON */}
       <button
         onClick={leaveGame}
-        className="absolute left-5 top-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/50 backdrop-blur-md transition hover:bg-black/80"
+        className="absolute left-2 top-2 z-50 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/50 backdrop-blur-md transition hover:bg-black/80 sm:left-5 sm:top-5 sm:h-11 sm:w-11"
       >
-        <ArrowLeft size={22} />
+        <ArrowLeft size={20} className="sm:h-[22px] sm:w-[22px]" />
       </button>
 
       {/* CONNECTION STATUS */}
-      <div className="absolute right-5 top-5 z-50 flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-4 py-2 text-xs backdrop-blur-md">
+      <div className="absolute right-2 top-2 z-50 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/50 px-2.5 py-1.5 text-[10px] backdrop-blur-md sm:right-5 sm:top-5 sm:gap-2 sm:px-4 sm:py-2 sm:text-xs">
         <span
           className={`h-2 w-2 rounded-full ${
             connected ? "bg-green-400" : "bg-red-500"
@@ -611,10 +612,10 @@ function BotPageContent() {
       </div>
 
       {/* TABLE AREA */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-20">
-        <div className="relative flex h-[min(78vh,760px)] w-full max-w-[1250px] items-center justify-center">
+      <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-1 pb-28 pt-14 sm:px-4 sm:py-20 landscape:px-2 landscape:pb-20 landscape:pt-12">
+        <div className="relative flex h-[58dvh] w-full max-w-[1250px] items-center justify-center sm:h-[min(78vh,760px)] landscape:h-[calc(100dvh-100px)]">
           {/* POKER TABLE */}
-          <div className="absolute inset-x-[8%] inset-y-[15%]">
+          <div className="absolute inset-x-[5%] inset-y-[17%] sm:inset-x-[8%] sm:inset-y-[15%] landscape:inset-x-[12%] landscape:inset-y-[12%]">
             <PokerTable />
           </div>
 
@@ -647,15 +648,15 @@ function BotPageContent() {
 
           {/* POT */}
           <div className="absolute left-1/2 top-[17%] z-20 -translate-x-1/2 -translate-y-1/2">
-            <div className="flex min-w-[125px] flex-col items-center rounded-2xl border border-amber-300/20 bg-black/65 px-5 py-2 shadow-xl backdrop-blur-md">
-              <span className="text-[10px] font-bold tracking-[0.25em] text-amber-300/70">
+            <div className="flex min-w-[95px] flex-col items-center rounded-xl border border-amber-300/20 bg-black/65 px-3 py-1.5 shadow-xl backdrop-blur-md sm:min-w-[125px] sm:rounded-2xl sm:px-5 sm:py-2">
+              <span className="text-[8px] font-bold tracking-[0.2em] text-amber-300/70 sm:text-[10px] sm:tracking-[0.25em]">
                 TOTAL POT
               </span>
 
-              <div className="mt-1 flex items-center gap-2">
-                <Coins size={17} className="text-amber-400" />
+              <div className="mt-1 flex items-center gap-1.5 sm:gap-2">
+                <Coins size={14} className="text-amber-400 sm:h-[17px] sm:w-[17px]" />
 
-                <span className="text-xl font-black tabular-nums">
+                <span className="text-base font-black tabular-nums sm:text-xl">
                   {formatNumber(gameData.pot || 0)}
                 </span>
               </div>
@@ -663,11 +664,11 @@ function BotPageContent() {
           </div>
 
           {/* COMMUNITY CARDS */}
-          <div className="absolute left-1/2 top-[49%] z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-2 sm:gap-3">
+          <div className="absolute left-1/2 top-[49%] z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1 sm:gap-3 landscape:gap-2">
             {communityCards.map((card, index) => (
               <div
                 key={`${card.rank}${card.suit}-${index}`}
-                className="relative h-[clamp(65px,14vh,115px)] w-[clamp(46px,7vw,78px)] overflow-hidden rounded-lg border border-white/20 bg-white shadow-[0_8px_20px_rgba(0,0,0,.4)]"
+                className="relative h-[clamp(48px,12vh,115px)] w-[clamp(34px,6vw,78px)] overflow-hidden rounded-md border border-white/20 bg-white shadow-[0_8px_20px_rgba(0,0,0,.4)] sm:h-[clamp(65px,14vh,115px)] sm:w-[clamp(46px,7vw,78px)] sm:rounded-lg"
               >
                 <img
                   src={getCardImage(
@@ -684,11 +685,11 @@ function BotPageContent() {
 
           {/* EMPTY COMMUNITY CARD SLOTS */}
           {communityCards.length === 0 && (
-            <div className="absolute left-1/2 top-[49%] z-10 flex -translate-x-1/2 -translate-y-1/2 gap-2 opacity-20">
+            <div className="absolute left-1/2 top-[49%] z-10 flex -translate-x-1/2 -translate-y-1/2 gap-1 opacity-20 sm:gap-2">
               {Array.from({ length: 5 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-[clamp(65px,10vh,115px)] w-[clamp(46px,7vw,78px)] rounded-lg border border-dashed border-white/50"
+                  className="h-[clamp(48px,12vh,115px)] w-[clamp(34px,6vw,78px)] rounded-md border border-dashed border-white/50 sm:h-[clamp(65px,10vh,115px)] sm:w-[clamp(46px,7vw,78px)] sm:rounded-lg"
                 />
               ))}
             </div>
@@ -696,7 +697,7 @@ function BotPageContent() {
 
           {/* ERROR */}
           {error && (
-            <div className="absolute bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-950/90 px-5 py-3 text-sm text-red-200 shadow-xl">
+            <div className="absolute bottom-24 left-1/2 z-50 max-w-[90%] -translate-x-1/2 rounded-xl border border-red-500/30 bg-red-950/90 px-4 py-2 text-center text-xs text-red-200 shadow-xl sm:px-5 sm:py-3 sm:text-sm">
               {error}
             </div>
           )}
@@ -723,18 +724,20 @@ function BotPageContent() {
           setBuyInAmount(minBuyIn);
           setShowBuyIn(true);
         }}
-        className="absolute bottom-14 left-5 z-40 flex items-center gap-2 rounded-xl border border-amber-400/30 bg-black/70 px-4 py-3 text-sm font-bold shadow-lg backdrop-blur-md transition hover:bg-black"
+        className="absolute bottom-[5.5rem] left-2 z-40 flex items-center gap-1.5 rounded-xl border border-amber-400/30 bg-black/70 px-2.5 py-2 text-xs font-bold shadow-lg backdrop-blur-md transition hover:bg-black sm:bottom-14 sm:left-5 sm:gap-2 sm:px-4 sm:py-3 sm:text-sm landscape:bottom-14"
       >
-        <Plus size={17} className="text-amber-400" />
+        <Plus size={15} className="text-amber-400 sm:h-[17px] sm:w-[17px]" />
         Add Chips
       </button>
 
       {/* RAISE MODAL */}
       {showRaise && myPlayer && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#111713] p-6 shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-lg font-bold">Raise Bet</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/75 p-3 backdrop-blur-sm sm:p-4">
+          <div className="my-auto w-full max-w-sm rounded-2xl border border-white/10 bg-[#111713] p-4 shadow-2xl sm:p-6">
+            <div className="mb-5 flex items-center justify-between sm:mb-6">
+              <h3 className="text-base font-bold sm:text-lg">
+                Raise Bet
+              </h3>
 
               <button
                 onClick={() => setShowRaise(false)}
@@ -772,7 +775,7 @@ function BotPageContent() {
             <button
               onClick={handleRaise}
               disabled={!myTurn || raiseAmount < bigBlind}
-              className="mt-6 w-full rounded-xl bg-amber-500 py-3 font-bold text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
+              className="mt-5 w-full rounded-xl bg-amber-500 py-3 text-sm font-bold text-black transition hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40 sm:mt-6 sm:text-base"
             >
               Confirm Raise
             </button>
@@ -782,10 +785,12 @@ function BotPageContent() {
 
       {/* BUY CHIPS MODAL */}
       {showBuyIn && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#111713] p-6 shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-lg font-bold">Add Table Chips</h3>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/75 p-3 backdrop-blur-sm sm:p-4">
+          <div className="my-auto w-full max-w-sm rounded-2xl border border-white/10 bg-[#111713] p-4 shadow-2xl sm:p-6">
+            <div className="mb-5 flex items-center justify-between sm:mb-6">
+              <h3 className="text-base font-bold sm:text-lg">
+                Add Table Chips
+              </h3>
 
               <button
                 onClick={() => setShowBuyIn(false)}
@@ -795,12 +800,12 @@ function BotPageContent() {
               </button>
             </div>
 
-            <div className="mb-5 rounded-xl bg-white/5 p-4">
+            <div className="mb-4 rounded-xl bg-white/5 p-3 sm:mb-5 sm:p-4">
               <p className="text-xs text-white/40">
                 Current table chips
               </p>
 
-              <p className="mt-1 text-xl font-bold">
+              <p className="mt-1 text-lg font-bold sm:text-xl">
                 {formatNumber(myPlayer?.chips || 0)}
               </p>
             </div>
@@ -817,7 +822,7 @@ function BotPageContent() {
               onChange={(event) =>
                 setBuyInAmount(Number(event.target.value))
               }
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none focus:border-amber-400"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none focus:border-amber-400 sm:text-base"
             />
 
             <p className="mt-2 text-xs text-white/40">
@@ -828,7 +833,7 @@ function BotPageContent() {
             <button
               onClick={handleBuyIn}
               disabled={!connected}
-              className="mt-6 w-full rounded-xl bg-amber-500 py-3 font-bold text-black transition hover:bg-amber-400 disabled:opacity-40"
+              className="mt-5 w-full rounded-xl bg-amber-500 py-3 text-sm font-bold text-black transition hover:bg-amber-400 disabled:opacity-40 sm:mt-6 sm:text-base"
             >
               Confirm
             </button>
@@ -838,18 +843,18 @@ function BotPageContent() {
 
       {/* WINNER BANNER */}
       {winner && (
-        <div className="pointer-events-none fixed left-1/2 top-24 z-[60] -translate-x-1/2">
-          <div className="rounded-2xl border border-amber-300/30 bg-black/85 px-8 py-4 text-center shadow-2xl backdrop-blur-md">
-            <p className="text-xs font-bold tracking-[0.3em] text-amber-300">
+        <div className="pointer-events-none fixed left-1/2 top-14 z-[60] max-w-[90%] -translate-x-1/2 sm:top-24">
+          <div className="rounded-2xl border border-amber-300/30 bg-black/85 px-5 py-3 text-center shadow-2xl backdrop-blur-md sm:px-8 sm:py-4">
+            <p className="text-[10px] font-bold tracking-[0.3em] text-amber-300 sm:text-xs">
               WINNER
             </p>
 
-            <h2 className="mt-1 text-2xl font-black">
+            <h2 className="mt-1 text-xl font-black sm:text-2xl">
               {winner.username}
             </h2>
 
             {winner.hand && (
-              <p className="mt-1 text-sm text-white/60">
+              <p className="mt-1 text-xs text-white/60 sm:text-sm">
                 {winner.hand}
               </p>
             )}
@@ -868,7 +873,7 @@ export default function BotPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center bg-[#080b09] text-white">
+        <main className="flex min-h-[100dvh] items-center justify-center bg-[#080b09] text-white">
           <Loader2 className="h-10 w-10 animate-spin text-amber-400" />
         </main>
       }
