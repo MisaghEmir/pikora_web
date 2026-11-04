@@ -133,7 +133,7 @@ export default async function BlogArticlePage({ params }: Props) {
       </section>
 
       <footer className="border-t border-white/5 py-7 text-center text-white/30 text-sm">
-        © {new Date().getFullYear()} PIKORA. All rights reserved.
+    © 2026 PIKORA. All rights reserved.
       </footer>
     </main>
   );
