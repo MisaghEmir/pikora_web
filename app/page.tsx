@@ -170,7 +170,7 @@ export default function Home() {
                           : "text-white/70"
                       }`}
                     >
-                      {mode.disabled ? "COMING SOON" : "PLAY NOW"}
+                      {mode.disabled ? "LOGIN" : "PLAY NOW"}
                     </span>
 
                     {mode.disabled ? (
@@ -194,7 +194,7 @@ export default function Home() {
                 className="relative flex min-h-[300px] cursor-not-allowed flex-col overflow-hidden rounded-2xl border border-white/[0.04] bg-[#111613]/70 p-7 opacity-35 grayscale md:min-h-[350px] md:p-8"
               >
                 <div className="absolute right-5 top-5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[9px] font-bold tracking-widest text-white/50">
-                  COMING SOON
+                  LOGIN
                 </div>
 
                 {cardContent}

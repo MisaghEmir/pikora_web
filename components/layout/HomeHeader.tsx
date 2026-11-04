@@ -6,6 +6,7 @@ import { avatarImages } from "@/utils/assets";
 interface HomeHeaderProps {
   user: {
     avatar?: string;
+    chips?: number;
   } | null;
   chips: number;
   isLoaded: boolean;
@@ -16,6 +17,8 @@ export default function HomeHeader({
   chips,
   isLoaded,
 }: HomeHeaderProps) {
+  const actualChips = Number(user?.chips ?? chips ?? 0);
+
   return (
     <header className="relative z-10 border-b border-white/[0.07] bg-black/20 backdrop-blur-xl">
       <div className="mx-auto flex h-[82px] w-full max-w-[1500px] items-center justify-between px-5 md:px-10">
@@ -45,7 +48,7 @@ export default function HomeHeader({
                 <Coins className="h-5 w-5 text-[#e4bd6d]" />
 
                 <span className="text-sm font-bold text-[#f3d99f]">
-                  {chips.toLocaleString()}
+                  {actualChips.toLocaleString()}
                 </span>
 
                 <span className="hidden text-xs text-white/40 sm:inline">

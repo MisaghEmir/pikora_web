@@ -17,6 +17,8 @@ import {
   Plus,
   X,
   Loader2,
+  Smartphone,
+  RotateCw,
 } from "lucide-react";
 
 import PokerTable from "@/components/game/PokerTable";
@@ -113,6 +115,10 @@ function BotPageContent() {
     null,
   );
 
+  // ORIENTATION
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [orientationReady, setOrientationReady] = useState(false);
+
   const [guest, setGuest] = useState<Guest | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameData, setGameData] = useState<any>({});
@@ -170,6 +176,50 @@ function BotPageContent() {
       connectionTimerRef.current = null;
     }
   };
+
+  // --------------------------------------------------
+  // AUTOMATIC LANDSCAPE REQUEST
+  // --------------------------------------------------
+
+const handleLandscape = useCallback(async () => {
+  try {
+    if (screen.orientation?.lock) {
+      await screen.orientation.lock("landscape");
+    }
+  } catch (error) {
+    console.log("Landscape lock is not supported:", error);
+  }
+
+  setTimeout(() => {
+    setIsLandscape(window.innerWidth > window.innerHeight);
+  }, 300);
+}, []);
+
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+
+    window.addEventListener("resize", checkOrientation);
+    window.addEventListener("orientationchange", checkOrientation);
+
+    // Show loading for 2 seconds, then request landscape.
+    const timer = setTimeout(async () => {
+      await handleLandscape();
+      checkOrientation();
+      setOrientationReady(true);
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", checkOrientation);
+      window.removeEventListener("orientationchange", checkOrientation);
+
+      try {
+        screen.orientation?.unlock();
+      } catch {}
+    };
+  }, [handleLandscape]);
 
   // --------------------------------------------------
   // LOAD SAVED VISUAL SETTINGS
@@ -525,6 +575,83 @@ function BotPageContent() {
     socket?.disconnect();
     router.push("/");
   };
+
+  // --------------------------------------------------
+  // INITIAL LANDSCAPE LOADING
+  // --------------------------------------------------
+
+  if (!orientationReady) {
+    return (
+      <main className="fixed inset-0 z-[9999] flex min-h-[100dvh] items-center justify-center bg-[#07130f] px-6 text-white">
+        <div className="flex flex-col items-center text-center">
+          <div className="relative mb-7 flex h-28 w-28 items-center justify-center rounded-3xl border border-amber-400/30 bg-black/40 shadow-2xl shadow-amber-500/10">
+            <Smartphone className="h-16 w-16 text-amber-400" />
+            <div className="absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full border border-amber-400/30 bg-[#10251b]">
+              <RotateCw className="h-5 w-5 animate-spin text-amber-400" />
+            </div>
+          </div>
+
+          <h1 className="text-2xl font-black tracking-widest text-amber-400">
+            PIKORA
+          </h1>
+
+          <p className="mt-4 text-sm text-white/60">
+            Preparing your poker table...
+          </p>
+
+          <Loader2 className="mt-6 h-7 w-7 animate-spin text-amber-400" />
+        </div>
+      </main>
+    );
+  }
+
+  // --------------------------------------------------
+  // LANDSCAPE REQUIRED
+  // --------------------------------------------------
+
+  if (!isLandscape) {
+    return (
+      <main className="fixed inset-0 z-[9999] flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#07130f] px-6 text-white">
+        <div className="flex max-w-sm flex-col items-center text-center">
+          <div className="relative mb-8 flex h-28 w-28 items-center justify-center rounded-3xl border border-amber-400/30 bg-black/40 shadow-2xl shadow-amber-500/10">
+            <Smartphone className="h-16 w-16 rotate-90 text-amber-400" />
+
+            <div className="absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full border border-amber-400/30 bg-[#10251b]">
+              <RotateCw className="h-5 w-5 animate-spin text-amber-400" />
+            </div>
+          </div>
+
+          <h1 className="text-2xl font-black tracking-widest text-amber-400">
+            PIKORA
+          </h1>
+
+          <h2 className="mt-4 text-lg font-bold">
+            Please Rotate Your Phone
+          </h2>
+
+          <p className="mt-3 text-sm leading-6 text-white/60">
+            Turn your phone horizontally to continue playing poker.
+          </p>
+
+          <button
+            onClick={handleLandscape}
+            className="mt-7 flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-black transition hover:bg-amber-400"
+          >
+            <RotateCw size={17} />
+            Try Landscape Mode
+          </button>
+
+          <button
+            onClick={leaveGame}
+            className="mt-7 flex items-center gap-2 text-sm text-white/50 transition hover:text-white"
+          >
+            <ArrowLeft size={17} />
+            Back to lobby
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   // --------------------------------------------------
   // LOADING

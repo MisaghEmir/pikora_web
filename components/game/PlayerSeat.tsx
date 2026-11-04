@@ -212,15 +212,16 @@ export default function PlayerSeat({
       {/* Timer */}
       <div className="mt-[5px] h-1 w-[46px] overflow-hidden rounded-full bg-[#333]">
         <motion.div
+          key={`${player.id}-${turn}-${gameState}`}
           className="h-full rounded-full bg-[#4CAF50]"
-          initial={{ width: "100%" }}
+          initial={{ width: isTurn && gameState !== "WAITING" ? "100%" : "0%" }}
           animate={{
-            width:
-              isTurn && gameState !== "WAITING"
-                ? `${(time / 10) * 100}%`
-                : "0%",
+            width: isTurn && gameState !== "WAITING" ? "0%" : "0%",
           }}
-          transition={{ duration: 0.2 }}
+          transition={{
+            duration: isTurn && gameState !== "WAITING" ? 10 : 0,
+            ease: "linear",
+          }}
         />
       </div>
 
