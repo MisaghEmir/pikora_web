@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Gift, UserRound, Settings, LogOut } from "lucide-react";
+import { Gift, UserRound, Settings, LogOut, BookOpen, Info } from "lucide-react";
 import { avatarImages } from "@/utils/assets";
 
 interface HomeFooterProps {
@@ -18,7 +18,8 @@ export default function HomeFooter({
 }: HomeFooterProps) {
   return (
     <footer className="relative z-10 border-t border-white/[0.07] bg-black/30 backdrop-blur-xl">
-      <div className="mx-auto flex min-h-[85px] w-full max-w-[1500px] items-center justify-between px-5 md:px-10">
+      <div className="mx-auto flex min-h-[85px] w-full max-w-[1500px] items-center justify-between gap-3 px-5 md:px-10">
+
         {/* User Profile */}
         <Link
           href={user ? "/profile" : "/login"}
@@ -47,11 +48,27 @@ export default function HomeFooter({
           </div>
         </Link>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
+        {/* Navigation Links */}
+        <nav className="flex items-center gap-1 sm:gap-2">
+          <Link
+            href="/about"
+            className="flex items-center gap-2 rounded-xl px-3 py-3 text-xs font-bold text-white/50 transition hover:bg-white/[0.05] hover:text-[#e4c77e]"
+          >
+            <Info size={17} />
+            <span className="hidden sm:inline">ABOUT US</span>
+          </Link>
+
+          <Link
+            href="/blog"
+            className="flex items-center gap-2 rounded-xl px-3 py-3 text-xs font-bold text-white/50 transition hover:bg-white/[0.05] hover:text-[#e4c77e]"
+          >
+            <BookOpen size={17} />
+            <span className="hidden sm:inline">BLOG</span>
+          </Link>
+
           <Link
             href="/gifts"
-            className="flex items-center gap-2 rounded-xl border border-[#c9a45c]/20 bg-[#c9a45c]/[0.07] px-4 py-3 text-xs font-bold text-[#e4c77e] transition hover:bg-[#c9a45c]/15"
+            className="flex items-center gap-2 rounded-xl border border-[#c9a45c]/20 bg-[#c9a45c]/[0.07] px-3 sm:px-4 py-3 text-xs font-bold text-[#e4c77e] transition hover:bg-[#c9a45c]/15"
           >
             <Gift size={18} />
             <span className="hidden sm:inline">GIFTS</span>
@@ -76,7 +93,7 @@ export default function HomeFooter({
           >
             <Settings size={18} />
           </Link>
-        </div>
+        </nav>
       </div>
     </footer>
   );
