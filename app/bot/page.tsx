@@ -646,7 +646,7 @@ function BotPageContent() {
           })}
 
           {/* POT */}
-          <div className="absolute left-1/2 top-[37%] z-20 -translate-x-1/2 -translate-y-1/2">
+          <div className="absolute left-1/2 top-[17%] z-20 -translate-x-1/2 -translate-y-1/2">
             <div className="flex min-w-[125px] flex-col items-center rounded-2xl border border-amber-300/20 bg-black/65 px-5 py-2 shadow-xl backdrop-blur-md">
               <span className="text-[10px] font-bold tracking-[0.25em] text-amber-300/70">
                 TOTAL POT
@@ -667,7 +667,7 @@ function BotPageContent() {
             {communityCards.map((card, index) => (
               <div
                 key={`${card.rank}${card.suit}-${index}`}
-                className="relative h-[clamp(65px,10vh,115px)] w-[clamp(46px,7vw,78px)] overflow-hidden rounded-lg border border-white/20 bg-white shadow-[0_8px_20px_rgba(0,0,0,.4)]"
+                className="relative h-[clamp(65px,14vh,115px)] w-[clamp(46px,7vw,78px)] overflow-hidden rounded-lg border border-white/20 bg-white shadow-[0_8px_20px_rgba(0,0,0,.4)]"
               >
                 <img
                   src={getCardImage(
@@ -723,7 +723,7 @@ function BotPageContent() {
           setBuyInAmount(minBuyIn);
           setShowBuyIn(true);
         }}
-        className="absolute bottom-24 right-5 z-40 flex items-center gap-2 rounded-xl border border-amber-400/30 bg-black/70 px-4 py-3 text-sm font-bold shadow-lg backdrop-blur-md transition hover:bg-black"
+        className="absolute bottom-14 left-5 z-40 flex items-center gap-2 rounded-xl border border-amber-400/30 bg-black/70 px-4 py-3 text-sm font-bold shadow-lg backdrop-blur-md transition hover:bg-black"
       >
         <Plus size={17} className="text-amber-400" />
         Add Chips

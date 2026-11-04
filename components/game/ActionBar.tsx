@@ -40,7 +40,7 @@ export default function ActionBar({
   ];
 
   return (
-    <div className="absolute bottom-2 right-0 z-30 flex w-full flex-wrap justify-center gap-2 px-3 sm:w-1/2 sm:justify-end sm:gap-2.5 sm:px-2">
+    <div className="absolute bottom-12 right-0 z-30 flex w-full flex-wrap justify-center gap-2 px-3 sm:w-1/2 sm:justify-end sm:gap-2.5 sm:px-2">
       {buttons.map((button) => (
         <button
           key={button.label}

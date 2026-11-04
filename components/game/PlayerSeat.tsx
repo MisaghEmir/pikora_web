@@ -37,8 +37,8 @@ type Props = {
 };
 
 const positionClasses: Record<Position, string> = {
-  top: "right-[calc(50%-165px)] top-[5%]",
-  left: "left-[calc(50%-165px)] top-[5%]",
+  top: "right-[calc(50%-295px)] top-[5%]",
+  left: "left-[calc(50%-265px)] top-[5%]",
   right: "right-[40px] bottom-[120px]",
   bottomLeft: "left-[40px] bottom-[120px]",
   me: "bottom-[25px] left-1/2 -translate-x-1/2",
