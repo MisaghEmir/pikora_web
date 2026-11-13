@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://poker-server-2-iv79.onrender.com/api";
+  "https://poker-server-4oi4.onrender.com/api";
 
 export const api = axios.create({
   baseURL: API_URL,
