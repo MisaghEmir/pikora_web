@@ -26,6 +26,7 @@ import ActionBar from "@/components/game/ActionBar";
 
 import { getCardImage } from "@/utils/cardImages";
 import { avatarImages, tableImages } from "@/utils/assets";
+import { useUserStore } from "@/store/userStore";
 
 type Card = {
   rank: string;
@@ -102,6 +103,21 @@ function BotPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // ZUSTAND USER STORE
+  const cardDesign = useUserStore(
+    (state) => state.user?.activeCardDesign || "default",
+  );
+
+  const tableBackground = useUserStore(
+    (state) => state.user?.activeTableBackground || "default",
+  );
+  const user = useUserStore((state) => state.user);
+  console.log({user})
+
+  const avatar = useUserStore(
+    (state) => state.user?.avatar || "avatar1",
+  );
+
   const socketRef = useRef<Socket | null>(null);
   const guestRef = useRef<Guest | null>(null);
 
@@ -110,7 +126,9 @@ function BotPageContent() {
   const leavingRef = useRef(false);
   const mountedRef = useRef(false);
 
-  const connectionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   // ORIENTATION
   const [isLandscape, setIsLandscape] = useState(false);
@@ -130,10 +148,6 @@ function BotPageContent() {
 
   const [showBuyIn, setShowBuyIn] = useState(false);
   const [buyInAmount, setBuyInAmount] = useState(0);
-
-  const [cardDesign, setCardDesign] = useState("default");
-  const [tableBackground, setTableBackground] = useState("default");
-  const [avatar, setAvatar] = useState("avatar1");
 
   const stakes = searchParams.get("stakes") || "10/20";
   const buyIn = Number(searchParams.get("chips") || 1000);
@@ -157,7 +171,9 @@ function BotPageContent() {
 
   const communityCards: Card[] = gameData.communityCards || [];
 
-  const selectedTable = tableImages.find((item) => item.id === tableBackground);
+  const selectedTable = tableImages.find(
+    (item) => item.id === tableBackground,
+  );
 
   const backgroundImage =
     selectedTable?.source ||
@@ -201,7 +217,6 @@ function BotPageContent() {
     window.addEventListener("resize", checkOrientation);
     window.addEventListener("orientationchange", checkOrientation);
 
-    // Show loading for 2 seconds, then request landscape.
     const timer = setTimeout(async () => {
       await handleLandscape();
       checkOrientation();
@@ -218,20 +233,6 @@ function BotPageContent() {
       } catch {}
     };
   }, [handleLandscape]);
-
-  // --------------------------------------------------
-  // LOAD SAVED VISUAL SETTINGS
-  // --------------------------------------------------
-
-  useEffect(() => {
-    setCardDesign(localStorage.getItem("pikora_card_design") || "default");
-
-    setTableBackground(
-      localStorage.getItem("pikora_table_background") || "default",
-    );
-
-    setAvatar(localStorage.getItem("pikora_avatar") || "avatar1");
-  }, []);
 
   // --------------------------------------------------
   // SOCKET CONNECTION
@@ -578,6 +579,7 @@ function BotPageContent() {
         <div className="flex flex-col items-center text-center">
           <div className="relative mb-7 flex h-28 w-28 items-center justify-center rounded-3xl border border-amber-400/30 bg-black/40 shadow-2xl shadow-amber-500/10">
             <Smartphone className="h-16 w-16 text-amber-400" />
+
             <div className="absolute -right-3 -top-3 flex h-10 w-10 items-center justify-center rounded-full border border-amber-400/30 bg-[#10251b]">
               <RotateCw className="h-5 w-5 animate-spin text-amber-400" />
             </div>

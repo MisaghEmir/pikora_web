@@ -74,7 +74,7 @@ export default function RegisterPage() {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      router.replace("/bot");
+      router.replace("/");
     } catch (err) {
       setError(
         err instanceof Error

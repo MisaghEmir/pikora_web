@@ -1,5 +1,6 @@
 
 import { create } from "zustand";
+import { api } from "@/lib/api";
 
 interface User {
   _id: string;
@@ -61,38 +62,47 @@ export const useUserStore = create<UserStore>((set) => ({
   },
 
   // LOAD USER
-  loadUser: async () => {
-    try {
-      const userData = localStorage.getItem("user");
-      const token = localStorage.getItem("token");
+ loadUser: async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-      console.log("📦 STORED USER:", userData);
-
-      if (!userData || !token) {
-        set({
-          user: null,
-          token: null,
-        });
-        return;
-      }
-
-      const user = JSON.parse(userData) as User;
-
-      set({
-        user,
-        token,
-      });
-
-      console.log("✅ ZUSTAND USER LOADED:", user);
-    } catch (error) {
-      console.log("❌ LOAD USER ERROR:", error);
-
-      set({
-        user: null,
-        token: null,
-      });
+    if (!token) {
+      set({ user: null, token: null });
+      return;
     }
-  },
+
+    console.log("🚀 CHECKING TOKEN WITH /AUTH/ME...");
+
+    const response = await api.get("/auth/me");
+
+    const user = response.data.user;
+
+    if (!user?._id) {
+      throw new Error("Invalid user response");
+    }
+
+    localStorage.setItem("user", JSON.stringify(user));
+
+    set({
+      user,
+      token,
+    });
+
+    console.log("✅ USER FETCHED FROM SERVER:", user);
+  } catch (error: any) {
+    console.log(
+      "❌ LOAD USER ERROR:",
+      error?.response?.data || error?.message,
+    );
+
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
+      set({ user: null, token: null });
+    }
+  }
+},
 
   // LOGOUT
   logout: async () => {

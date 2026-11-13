@@ -244,15 +244,15 @@ export default function PlayerSeat({
                 opacity: 0,
               }}
               transition={{ duration: 0.3 }}
-              className="flex h-5 items-center rounded-full bg-[#ad4e17] text-white shadow-md"
+              className="flex h-5 p-0 items-center rounded-full bg-[#ad4e17] text-white shadow-md"
             >
-              <span className="flex h-6 w-6 items-center justify-center">
+              <span className="flex h-6 w-6 items-center relative justify-center">
                 <Image
-                  src="/images/chip.png"
+                  src={`/images/${player.lastAction === "FOLD" ? "folded.png" : player.lastAction === "RAISE" ? "reased.png" : player.lastAction === "ALL_IN" ? "allined.png" : "chip.png"}`}
                   alt="Chip"
-                  width={25}
-                  height={25}
-                  className="object-contain"
+                  width={55}
+                  height={55}
+                  className="object-contain scale-125 absolute left-[-3px] top-[1px]"
                 />
               </span>
 
