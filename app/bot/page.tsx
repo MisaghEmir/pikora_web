@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -19,10 +20,16 @@ import {
   Smartphone,
   RotateCw,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import PokerTable from "@/components/game/PokerTable";
 import PlayerSeat, { type PlayerBot } from "@/components/game/PlayerSeat";
 import ActionBar from "@/components/game/ActionBar";
+
+import {
+  GameSoundsProvider,
+  useGameSounds,
+} from "@/components/game/GameSounds";
 
 import { getCardImage } from "@/utils/cardImages";
 import { avatarImages, tableImages } from "@/utils/assets";
@@ -55,6 +62,15 @@ type Guest = {
   guestId: string;
   username: string;
   roomId: string;
+};
+
+type BetAnimation = {
+  id: number;
+  amount: number;
+  startX: number;
+  startY: number;
+  targetX: number;
+  targetY: number;
 };
 
 const positions = ["bottomLeft", "left", "top", "right", "me"] as const;
@@ -103,6 +119,8 @@ function BotPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const { playSound } = useGameSounds();
+
   // ZUSTAND USER STORE
   const cardDesign = useUserStore(
     (state) => state.user?.activeCardDesign || "default",
@@ -111,8 +129,9 @@ function BotPageContent() {
   const tableBackground = useUserStore(
     (state) => state.user?.activeTableBackground || "default",
   );
+
   const user = useUserStore((state) => state.user);
-  console.log({user})
+  console.log({ user });
 
   const avatar = useUserStore(
     (state) => state.user?.avatar || "avatar1",
@@ -126,6 +145,16 @@ function BotPageContent() {
   const leavingRef = useRef(false);
   const mountedRef = useRef(false);
 
+  const tableAreaRef = useRef<HTMLDivElement>(null);
+  const previousBetsRef = useRef<Map<string, number> | null>(null);
+  const animationIdRef = useRef(0);
+
+  // SOUND TRACKING
+  const previousTurnRef = useRef(false);
+  const previousWinnerRef = useRef<string | null>(null);
+  const previousActionsRef = useRef<Map<string, string>>(new Map());
+  const previousCommunityCardsRef = useRef(0);
+
   const connectionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -138,6 +167,8 @@ function BotPageContent() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [gameData, setGameData] = useState<any>({});
   const [winner, setWinner] = useState<Winner | null>(null);
+
+  const [betAnimations, setBetAnimations] = useState<BetAnimation[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [connected, setConnected] = useState(false);
@@ -180,10 +211,136 @@ function BotPageContent() {
     tableImages.find((item) => item.id === "default")?.source ||
     "/images/backgrounds/Dark.png";
 
+  // --------------------------------------------------
+  // SOUND EFFECTS
+  // --------------------------------------------------
+
+  // YOUR TURN
+  useEffect(() => {
+    if (myTurn && !previousTurnRef.current) {
+      playSound("yourTurn");
+    }
+
+    previousTurnRef.current = myTurn;
+  }, [myTurn, playSound]);
+
+  // WIN / LOSE
+  useEffect(() => {
+    if (!winner || !guest) {
+      previousWinnerRef.current = null;
+      return;
+    }
+
+    const winnerId = String(winner.id);
+
+    if (previousWinnerRef.current === winnerId) return;
+
+    previousWinnerRef.current = winnerId;
+
+    if (winnerId === String(guest.guestId)) {
+      playSound("win");
+    } else {
+      playSound("lose");
+    }
+  }, [winner, guest, playSound]);
+
   const clearConnectionTimer = () => {
     if (connectionTimerRef.current) {
       clearTimeout(connectionTimerRef.current);
       connectionTimerRef.current = null;
+    }
+  };
+
+  // --------------------------------------------------
+  // BET CHIP ANIMATION
+  // --------------------------------------------------
+
+  const animateNewBets = (nextPlayers: Player[]) => {
+    const previousBets = previousBetsRef.current;
+
+    const nextBets = new Map<string, number>();
+
+    nextPlayers.forEach((player) => {
+      nextBets.set(
+        String(player.id),
+        Number(player.currentBet ?? 0),
+      );
+    });
+
+    if (!previousBets) {
+      previousBetsRef.current = nextBets;
+      return;
+    }
+
+    const tableElement = tableAreaRef.current;
+
+    if (!tableElement) {
+      previousBetsRef.current = nextBets;
+      return;
+    }
+
+    const tableRect = tableElement.getBoundingClientRect();
+
+    const targetX = tableRect.width / 2;
+    const targetY = tableRect.height * 0.49;
+
+    const newAnimations: BetAnimation[] = [];
+    let hasNewBet = false;
+
+    const seats = tableElement.querySelectorAll<HTMLElement>(
+      "[data-player-id]",
+    );
+
+    nextPlayers.forEach((player) => {
+      const playerId = String(player.id);
+
+      const oldBet = previousBets.get(playerId) ?? 0;
+      const newBet = Number(player.currentBet ?? 0);
+
+      const difference = newBet - oldBet;
+
+      if (difference <= 0) return;
+
+      hasNewBet = true;
+
+      const seat = Array.from(seats).find(
+        (element) => element.dataset.playerId === playerId,
+      );
+
+      if (!seat) return;
+
+      const seatRect = seat.getBoundingClientRect();
+
+      const startX =
+        seatRect.left - tableRect.left + seatRect.width / 2;
+
+      const startY =
+        seatRect.top - tableRect.top + Math.min(20, seatRect.height / 2);
+
+      animationIdRef.current += 1;
+
+      newAnimations.push({
+        id: animationIdRef.current,
+        amount: difference,
+        startX,
+        startY,
+        targetX,
+        targetY,
+      });
+    });
+
+    previousBetsRef.current = nextBets;
+
+    // CHIP SOUND
+    if (hasNewBet) {
+      playSound("chip");
+    }
+
+    if (newAnimations.length > 0) {
+      setBetAnimations((current) => [
+        ...current,
+        ...newAnimations,
+      ]);
     }
   };
 
@@ -243,6 +400,14 @@ function BotPageContent() {
     leavingRef.current = false;
     joinedRef.current = false;
     startedRef.current = false;
+
+    previousBetsRef.current = null;
+    previousActionsRef.current.clear();
+    previousCommunityCardsRef.current = 0;
+    previousTurnRef.current = false;
+    previousWinnerRef.current = null;
+
+    setBetAnimations([]);
 
     let socket: Socket | null = null;
 
@@ -379,7 +544,34 @@ function BotPageContent() {
 
           clearConnectionTimer();
 
-          setPlayers(data?.players || []);
+          const initialPlayers: Player[] = data?.players || [];
+
+          previousBetsRef.current = new Map(
+            initialPlayers.map((player) => [
+              String(player.id),
+              Number(player.currentBet ?? 0),
+            ]),
+          );
+
+          // INITIAL SOUND TRACKING
+          previousCommunityCardsRef.current = (
+            data?.communityCards || []
+          ).length;
+
+          previousActionsRef.current = new Map(
+            initialPlayers.map((player) => [
+              String(player.id),
+              String(player.lastAction || ""),
+            ]),
+          );
+
+          previousWinnerRef.current = null;
+          previousTurnRef.current = false;
+
+          // DEALING CARDS SOUND
+          playSound("card");
+
+          setPlayers(initialPlayers);
           setGameData(data || {});
           setWinner(data?.winner ?? null);
           setLoading(false);
@@ -393,7 +585,60 @@ function BotPageContent() {
 
           clearConnectionTimer();
 
-          setPlayers(data?.players || []);
+          const nextPlayers: Player[] = data?.players || [];
+
+          // COMMUNITY CARD SOUND
+          const nextCommunityCardsCount = (
+            data?.communityCards || []
+          ).length;
+
+          if (
+            nextCommunityCardsCount > previousCommunityCardsRef.current
+          ) {
+            playSound("card");
+          }
+
+          previousCommunityCardsRef.current = nextCommunityCardsCount;
+
+          // PLAYER ACTION SOUNDS
+          nextPlayers.forEach((player) => {
+            const playerId = String(player.id);
+            const currentAction = String(player.lastAction || "");
+            const previousAction =
+              previousActionsRef.current.get(playerId);
+
+            if (!currentAction || currentAction === previousAction) return;
+
+            switch (currentAction.toUpperCase()) {
+              case "FOLD":
+                playSound("fold");
+                break;
+
+              case "CHECK":
+                playSound("check");
+                break;
+
+              case "CALL":
+                playSound("call");
+                break;
+
+              case "RAISE":
+              case "ALL_IN":
+                playSound("raise");
+                break;
+            }
+          });
+
+          previousActionsRef.current = new Map(
+            nextPlayers.map((player) => [
+              String(player.id),
+              String(player.lastAction || ""),
+            ]),
+          );
+
+          animateNewBets(nextPlayers);
+
+          setPlayers(nextPlayers);
           setGameData(data || {});
           setWinner(data?.winner ?? null);
           setLoading(false);
@@ -476,7 +721,7 @@ function BotPageContent() {
       joinedRef.current = false;
       startedRef.current = false;
     };
-  }, [smallBlind, bigBlind, buyIn]);
+  }, [smallBlind, bigBlind, buyIn, playSound]);
 
   // --------------------------------------------------
   // GAME ACTIONS
@@ -730,7 +975,10 @@ function BotPageContent() {
 
       {/* TABLE AREA */}
       <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-1 pb-28 pt-14 sm:px-4 sm:py-20 landscape:px-2 landscape:pb-20 landscape:pt-12">
-        <div className="relative flex h-[58dvh] w-full max-w-[1250px] items-center justify-center sm:h-[min(78vh,760px)] landscape:h-[calc(100dvh-100px)]">
+        <div
+          ref={tableAreaRef}
+          className="relative flex h-[58dvh] w-full max-w-[1250px] items-center justify-center sm:h-[min(78vh,760px)] landscape:h-[calc(100dvh-100px)]"
+        >
           {/* POKER TABLE */}
           <div className="absolute inset-x-[5%] inset-y-[17%] sm:inset-x-[8%] sm:inset-y-[15%] landscape:inset-x-[12%] landscape:inset-y-[12%]">
             <PokerTable />
@@ -799,6 +1047,45 @@ function BotPageContent() {
                 />
               </div>
             ))}
+          </div>
+
+          {/* BET CHIP ANIMATIONS */}
+          <div className="pointer-events-none absolute inset-0 z-40 overflow-visible">
+            <AnimatePresence>
+              {betAnimations.map((animation) => (
+                <motion.div
+                  key={animation.id}
+                  initial={{
+                    x: animation.startX,
+                    y: animation.startY,
+                    opacity: 0,
+                    scale: 0.5,
+                  }}
+                  animate={{
+                    x: animation.targetX,
+                    y: animation.targetY,
+                    opacity: [0, 1, 1, 0],
+                    scale: [0.5, 1.15, 1, 0.7],
+                  }}
+                  transition={{
+                    duration: 0.85,
+                    ease: "easeInOut",
+                  }}
+                  onAnimationComplete={() => {
+                    setBetAnimations((current) =>
+                      current.filter((item) => item.id !== animation.id),
+                    );
+                  }}
+                  className="absolute left-0 top-0 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border border-amber-300/40 bg-black/80 px-2 py-1 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
+                >
+                  <Coins className="h-6 w-6 text-amber-400" />
+
+                  <span className="text-xs font-black text-amber-300">
+                    {formatNumber(animation.amount)}
+                  </span>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
           {/* EMPTY COMMUNITY CARD SLOTS */}
@@ -975,19 +1262,21 @@ function BotPageContent() {
 }
 
 // ==================================================
-// PAGE WITH SUSPENSE
+// PAGE WITH SUSPENSE + SOUND PROVIDER
 // ==================================================
 
 export default function BotPage() {
   return (
-    <Suspense
-      fallback={
-        <main className="flex min-h-[100dvh] items-center justify-center bg-[#080b09] text-white">
-          <Loader2 className="h-10 w-10 animate-spin text-amber-400" />
-        </main>
-      }
-    >
-      <BotPageContent />
-    </Suspense>
+    <GameSoundsProvider>
+      <Suspense
+        fallback={
+          <main className="flex min-h-[100dvh] items-center justify-center bg-[#080b09] text-white">
+            <Loader2 className="h-10 w-10 animate-spin text-amber-400" />
+          </main>
+        }
+      >
+        <BotPageContent />
+      </Suspense>
+    </GameSoundsProvider>
   );
 }

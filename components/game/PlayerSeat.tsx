@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -96,6 +97,7 @@ export default function PlayerSeat({
           clearInterval(interval);
           return 0;
         }
+
         return previous - 1;
       });
     }, 1000);
@@ -108,7 +110,8 @@ export default function PlayerSeat({
 
   return (
     <div
-      className={`absolute z-20 flex scale-125 flex-col items-center ${positionClasses[position]}`}
+      data-player-id={player.id}
+      className={`absolute scale-150 z-20 flex scale-125 flex-col items-center ${positionClasses[position]}`}
     >
       {/* Dealer */}
       {player.dealer && (
@@ -163,12 +166,6 @@ export default function PlayerSeat({
                 ? getCardImage(cardDesign, card.rank, card.suit)
                 : "/images/cards/card/back.png";
 
-            console.log({
-              showRealCard,
-              card,
-              cardSource,
-            });
-
             return (
               <motion.div
                 key={`${player.id}-${index}-${cardKey}`}
@@ -214,9 +211,11 @@ export default function PlayerSeat({
         <motion.div
           key={`${player.id}-${turn}-${gameState}`}
           className="h-full rounded-full bg-[#4CAF50]"
-          initial={{ width: isTurn && gameState !== "WAITING" ? "100%" : "0%" }}
+          initial={{
+            width: isTurn && gameState !== "WAITING" ? "100%" : "0%",
+          }}
           animate={{
-            width: isTurn && gameState !== "WAITING" ? "0%" : "0%",
+            width: "0%",
           }}
           transition={{
             duration: isTurn && gameState !== "WAITING" ? 10 : 0,
@@ -226,37 +225,92 @@ export default function PlayerSeat({
       </div>
 
       {/* Action */}
-      <div className="mt-[5px] h-6">
+      <div className="mt-[5px] h-8">
         <AnimatePresence mode="wait">
           {actionText && (
             <motion.div
-              key={actionText}
+              key={`${player.id}-${player.lastAction}-${actionText}`}
               initial={{
-                scaleX: 0,
                 opacity: 0,
+                y: 15,
+                scale: 0.5,
               }}
-              animate={{
-                scaleX: 1,
-                opacity: 1,
-              }}
+              animate={
+                player.lastAction === "ALL_IN"
+                  ? {
+                      opacity: 1,
+                      y: 0,
+                      scale: [0.5, 1.25, 1],
+                      rotate: [0, -4, 4, 0],
+                    }
+                  : player.lastAction === "RAISE"
+                    ? {
+                        opacity: 1,
+                        y: 0,
+                        scale: [0.6, 1.15, 1],
+                      }
+                    : {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                      }
+              }
               exit={{
-                scaleX: 0,
                 opacity: 0,
+                y: -8,
+                scale: 0.7,
               }}
-              transition={{ duration: 0.3 }}
-              className="flex h-5 p-0 items-center rounded-full bg-[#ad4e17] text-white shadow-md"
+              transition={{
+                duration: player.lastAction === "ALL_IN" ? 0.55 : 0.35,
+                ease: "backOut",
+              }}
+              className={`relative flex h-6 items-center rounded-full text-white shadow-lg ${
+                player.lastAction === "ALL_IN"
+                  ? "bg-gradient-to-r from-red-700 via-red-500 to-red-700 shadow-red-500/50"
+                  : player.lastAction === "RAISE"
+                    ? "bg-gradient-to-r from-yellow-700 via-[#d49a24] to-yellow-700 shadow-yellow-500/40"
+                    : "bg-[#ad4e17]"
+              }`}
             >
-              <span className="flex h-6 w-6 items-center relative justify-center">
-                <Image
-                  src={`/images/${player.lastAction === "FOLD" ? "folded.png" : player.lastAction === "RAISE" ? "reased.png" : player.lastAction === "ALL_IN" ? "allined.png" : "chip.png"}`}
-                  alt="Chip"
-                  width={55}
-                  height={55}
-                  className="object-contain scale-125 absolute left-[-3px] top-[1px]"
+              {/* Glow */}
+              {(player.lastAction === "RAISE" ||
+                player.lastAction === "ALL_IN") && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 0.7, 0] }}
+                  transition={{ duration: 0.8 }}
+                  className="absolute inset-0 rounded-full bg-white blur-md"
                 />
+              )}
+
+              <span className="relative flex h-6 w-6 items-center justify-center">
+                <motion.div
+                  initial={{ rotate: -30, scale: 0.5 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ duration: 0.35 }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={`/images/${
+                      player.lastAction === "FOLD"
+                        ? "folded.png"
+                        : player.lastAction === "RAISE"
+                          ? "reased.png"
+                          : player.lastAction === "ALL_IN"
+                            ? "allined.png"
+                            : "chip.png"
+                    }`}
+                    alt="Action"
+                    width={55}
+                    height={55}
+                    className="absolute left-[-3px] top-[1px] scale-125 object-contain"
+                  />
+                </motion.div>
               </span>
 
-              <span className="px-2 text-xs font-semibold">{actionText}</span>
+              <span className="relative px-2 text-xs font-bold whitespace-nowrap">
+                {actionText}
+              </span>
             </motion.div>
           )}
         </AnimatePresence>
